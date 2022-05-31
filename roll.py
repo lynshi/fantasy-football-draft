@@ -19,7 +19,11 @@ def main(program_args: argparse.Namespace):
 
     if program_args.subparser == LeaguePlatform.SLEEPER.value:
         draft_order = sleeper.roll.roll_draft(
-            sleeper.league.get_teams(program_args.league_id), lambda x: True
+            [
+                u.display_name
+                for u in sleeper.league.get_users(program_args.league_id).values()
+            ],
+            lambda x: True,
         )
     else:
         raise NotImplementedError(f"Unsupported league type {program_args.subparser}")

@@ -1,7 +1,8 @@
 """Methods for retrieving league information."""
 
+from dataclasses import dataclass
 import json
-from typing import List
+from typing import Dict, Optional
 
 from loguru import logger
 import requests
@@ -10,17 +11,22 @@ import requests
 LEAGUE_USERS_URI = "https://api.sleeper.app/v1/league/{league_id}/users"
 
 
-def get_teams(league_id: str) -> List[str]:
-    """Gets a list of teams in the league in the form. If a team name is available, it is used;
-    otherwise, the user's display name is returned.
+@dataclass
+class User:
+    """Collection of user data."""
 
-    I'm not sure what the API response looks like for teams with co-owners, so I'm hoping such teams
-    will have team names and the entries will be deduplicated.
+    user_id: str
+    display_name: str
+    team_name: Optional[str] = None
+
+
+def get_users(league_id: str) -> Dict[str, User]:
+    """Gets a list of users in the league in the form.
 
     :param league_id: Id of the league.
     :type league_id: str
-    :return: Set of team or user names.
-    :rtype: Set[str]
+    :return: Mapping of user ids to users.
+    :rtype: Dict[str, User]
     """
     uri = LEAGUE_USERS_URI.format(league_id=league_id)
     logger.info(f"Getting teams from {uri}")
@@ -28,17 +34,15 @@ def get_teams(league_id: str) -> List[str]:
     response = requests.get(uri)
     response.raise_for_status()
 
-    team_names = set()
+    users = {}
 
     data = response.json()
     logger.debug(f"Users response: {json.dumps(data, sort_keys=True)}")
 
-    for user in data:
-        team_name = user.get("metadata", {}).get("team_name", None)
-        if team_name is not None:
-            team_names.add(team_name)
-            continue
+    for user_data in data:
+        user = User(
+            user_id=user_data["user_id"], display_name=user_data["display_name"]
+        )
+        user.team_name = user_data.get("metadata", {}).get("team_name", None)
 
-        team_names.add(user["display_name"])
-
-    return list(team_names)
+    return users
