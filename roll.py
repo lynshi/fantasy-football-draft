@@ -24,7 +24,7 @@ def main(program_args: argparse.Namespace):
             )
         else:
             logger.warning(
-                f"No valid constraints were loaded from the {program_args.constraints}."
+                f"No valid constraints were loaded from {program_args.constraints}."
             )
 
     logger.info(f"Selected platform: {LeaguePlatform(program_args.subparser)}")
