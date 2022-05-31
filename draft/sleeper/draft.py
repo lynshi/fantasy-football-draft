@@ -1,18 +1,19 @@
 """Methods for getting draft history information."""
 
 import json
-from typing import Dict, List
+from typing import List
 
 from loguru import logger
 import requests
 
+from draft.sleeper.league import get_users
 from draft._user import User
 
 
 DRAFT_URI = "https://api.sleeper.app/v1/draft/{draft_id}"
 
 
-def get_draft_order(draft_id: str, *, users: Dict[str, User]) -> List[User]:
+def get_draft_order(draft_id: str) -> List[User]:
     """Gets the draft order in the specified draft.
 
     :param draft_id: Sleeper draft id.
@@ -35,6 +36,9 @@ def get_draft_order(draft_id: str, *, users: Dict[str, User]) -> List[User]:
     draft_order_tuples = []
     for user_id, draft_position in data["draft_order"].items():
         draft_order_tuples.append((draft_position, user_id))
+
+    league_id = data["league_id"]
+    users = get_users(league_id)
 
     draft_order = []
     for _, user_id in sorted(draft_order_tuples):

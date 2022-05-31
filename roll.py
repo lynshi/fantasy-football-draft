@@ -23,7 +23,9 @@ def main(program_args: argparse.Namespace):
                 restricted_users=restricted_users,
             )
         else:
-            logger.warning(f"No valid constraints were loaded from the {program_args.constraints}.")
+            logger.warning(
+                f"No valid constraints were loaded from the {program_args.constraints}."
+            )
 
     logger.info(f"Selected platform: {LeaguePlatform(program_args.subparser)}")
 
@@ -96,7 +98,7 @@ if __name__ == "__main__":
     sleeper_parser = subparsers.add_parser(
         LeaguePlatform.SLEEPER.value, help="Gets league data from Sleeper"
     )
-    sleeper.parser.add_subparser(sleeper_parser)
+    sleeper.parser.add_arguments(sleeper_parser)
 
     args = parser.parse_args()
 
