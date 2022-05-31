@@ -1,4 +1,4 @@
-"""Creates a draft order randomly."""
+"""Gets users that consistently drafted in the bottom N positions in the specified drafts."""
 
 import argparse
 import sys
@@ -24,7 +24,9 @@ def main(program_args: argparse.Namespace):
             ):
                 # On the first pass, add all users with a bottom-N pick.
                 bottom_pick_users.add(user.user_id)
-                logger.debug(f"User {user} had a bottom {program_args.n} pick in draft {draft_id}")
+                logger.debug(
+                    f"User {user} had a bottom {program_args.n} pick in draft {draft_id}"
+                )
             else:
                 # On subsequent passes, remove any users who didn't have a bottom-N pick.
                 try:
@@ -44,7 +46,8 @@ def main(program_args: argparse.Namespace):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Gets users that have drafted with a pick in the last N in all the specified drafts."
+        description="Gets users that consistently drafted in the bottom N positions in the "
+        "specified drafts."
     )
     parser.add_argument("--log-level", type=str, required=False, default="INFO")
     parser.add_argument(
