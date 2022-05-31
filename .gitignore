@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 
 draft_order.txt
+constraints.json

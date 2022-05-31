@@ -2,22 +2,15 @@
 
 from dataclasses import dataclass
 import json
-from typing import Dict, Optional
+from typing import Dict
 
 from loguru import logger
 import requests
 
+from draft._user import User
+
 
 LEAGUE_USERS_URI = "https://api.sleeper.app/v1/league/{league_id}/users"
-
-
-@dataclass
-class User:
-    """Collection of user data."""
-
-    user_id: str
-    display_name: str
-    team_name: Optional[str] = None
 
 
 def get_users(league_id: str) -> Dict[str, User]:
@@ -40,9 +33,8 @@ def get_users(league_id: str) -> Dict[str, User]:
     logger.debug(f"Users response: {json.dumps(data, sort_keys=True)}")
 
     for user_data in data:
-        user = User(
-            user_id=user_data["user_id"], display_name=user_data["display_name"]
-        )
+        user = User(user_id=user_data["user_id"], name=user_data["display_name"])
         user.team_name = user_data.get("metadata", {}).get("team_name", None)
+        users[user.user_id] = user
 
     return users
