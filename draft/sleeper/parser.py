@@ -13,3 +13,11 @@ def add_subparser(sleeper_parser: argparse.ArgumentParser):
     sleeper_parser.add_argument(
         "--league-id", type=str, required=True, help="Id of the league"
     )
+    sleeper_parser.add_argument(
+        "--drafts",
+        type=str,
+        required=False,
+        action="extend",
+        nargs="+",
+        help="Ids of prior drafts",
+    )

@@ -3,34 +3,24 @@
 import argparse
 import json
 import sys
-from typing import List
 
 from loguru import logger
 
-from draft import sleeper, User
+from draft import constraints, sleeper
 from draft.platforms import LeaguePlatform
 
 
 def main(program_args: argparse.Namespace):
     if program_args.constraints:
         with open(program_args.constraints) as infile:
-            constraints = json.load(infile)
+            loaded_constraints = json.load(infile)
 
         # Quick hack instead of building a checker from a general constraint language.
-        def constraint_checker_builder():
-            top_five_guaranteed = set(constraints["top_five_guaranteed"]["user_ids"])
-
-            def _checker(pending_order: List[User]):
-                for user in pending_order[5:]:
-                    if user.user_id in top_five_guaranteed:
-                        logger.trace(f"User {user} must have a pick in the top five")
-                        return False
-
-                return True
-
-            return _checker
-
-        constraint_checker = constraint_checker_builder()
+        restricted_users = set(loaded_constraints["top_n_guaranteed"]["user_ids"])
+        constraint_checker = constraints.build_ensure_top_n_pick(
+            n=loaded_constraints["top_n_guaranteed"]["n"],
+            restricted_users=restricted_users,
+        )
     else:
         constraint_checker = lambda _: True
 
