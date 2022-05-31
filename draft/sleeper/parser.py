@@ -2,8 +2,6 @@
 
 import argparse
 
-from draft.platforms import LeaguePlatform
-
 
 def add_subparser(sleeper_parser: argparse.ArgumentParser):
     """Adds arguments for the argument parser for Sleeper leagues.

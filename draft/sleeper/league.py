@@ -1,6 +1,5 @@
 """Methods for retrieving league information."""
 
-from dataclasses import dataclass
 import json
 from typing import Dict
 
