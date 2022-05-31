@@ -11,21 +11,23 @@ from draft.platforms import LeaguePlatform
 
 
 def main(program_args: argparse.Namespace):
+    constraint_checker = lambda _: True
     if program_args.constraints:
         with open(program_args.constraints) as infile:
             loaded_constraints = json.load(infile)
 
-        # Quick hack instead of building a checker from a general constraint language.
-        restricted_users = set(loaded_constraints["top_n_guaranteed"]["user_ids"])
-        constraint_checker = constraints.build_ensure_top_n_pick(
-            n=loaded_constraints["top_n_guaranteed"]["n"],
-            restricted_users=restricted_users,
-        )
-    else:
-        constraint_checker = lambda _: True
+        if "top_n_guaranteed" in loaded_constraints:
+            restricted_users = set(loaded_constraints["top_n_guaranteed"]["user_ids"])
+            constraint_checker = constraints.build_ensure_top_n_pick(
+                n=loaded_constraints["top_n_guaranteed"]["n"],
+                restricted_users=restricted_users,
+            )
+        else:
+            logger.warning(f"No valid constraints were loaded from the {program_args.constraints}.")
 
     logger.info(f"Selected platform: {LeaguePlatform(program_args.subparser)}")
 
+    draft_order = []
     for i in range(args.num_rolls):
         logger.info(f"Roll number: {i}")
 
@@ -40,7 +42,7 @@ def main(program_args: argparse.Namespace):
             )
 
     output = ""
-    for user in draft_order:  # type: ignore
+    for user in draft_order:
         output += f"{user.name}\n"
     with open(program_args.output_file, "w") as outfile:
         outfile.write(output[:-1])
